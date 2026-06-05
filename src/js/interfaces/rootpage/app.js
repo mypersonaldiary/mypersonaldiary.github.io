@@ -1,4 +1,4 @@
 // app.js
-const { sveiciens } = require('./interface.js');
+const { ui } = require('./interface.js');
 
-console.log(check('App works perfectly no issues found'));
+console.log(ui('App is searching for ui'));
