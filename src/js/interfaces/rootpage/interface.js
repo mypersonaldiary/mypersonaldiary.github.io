@@ -4,7 +4,8 @@ const AUTHOR = "Oskars Zihmanis";
 
 let entries = [];
 let editingId = null;
-const STORAGE_KEY = 'mindscribe_entries';
+// CHANGED: Storage key updated to MyPersonalDiary_entries
+const STORAGE_KEY = 'MyPersonalDiary_entries';
 
 let entriesContainer, formContainer, titleInput, contentInput, submitBtn, cancelBtn;
 
@@ -117,7 +118,6 @@ function saveOrUpdate() {
   }
 }
 
-// Inject CSS dynamically
 function injectStyles() {
   const style = document.createElement('style');
   style.textContent = `
@@ -152,7 +152,6 @@ function injectStyles() {
   document.head.appendChild(style);
 }
 
-// Build the entire HTML structure (no external HTML)
 function buildUI() {
   const root = document.getElementById('diary-root');
   if (!root) return;
@@ -175,38 +174,46 @@ function buildUI() {
         <h2>📖 Your diary</h2>
         <div id="entriesList" class="entries-list"></div>
       </div>
-<footer>2026 OskarsZihmanis all rights reserved, My Personal Diary Is a digital product made by Oskars Zihmanis and is licensed under <a href="https://oskarszihmanis.github.io/p/mpd?listedversion=v1.33.232">My Personal Diary</a> © 2026 by <a href="https://oskarszihmanis.github.io/">Oskars Zihmanis</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nd.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">BasicClock is a digital product made by Oskars Zihmanis and is licensed under<a href="https://oskarszihmanis.github.io/p/bclock?listedversion=v1.12.521">Basic Clock</a> © 2026 by <a href="https://oskarszihmanis.github.io/">Oskars Zihmanis</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nd.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">My Secret Calculator is a digital product made by Oskars Zihmanis and is licensed under <a href="https://oskarszihmanis.github.io/p/mysecretcalc?listedversion=v1.32.233">My Secret Calculator</a> © 2026 by <a href="https://oskarszihmanis.github.io/">Oskars Zihmanis</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/nd.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"> </footer>
+      <footer class="diary-footer">
+        2026 OskarsZihmanis all rights reserved, My Personal Diary Is a digital product made by Oskars Zihmanis and is licensed under <a href="https://github.io">My Personal Diary</a> © 2026 by <a href="https://github.io">Oskars Zihmanis</a> is licensed under <a href="https://creativecommons.org">CC BY-NC-ND 4.0</a>
+      </footer>
     </div>
   `;
+}
+
+function ui(message) {
+  injectStyles();
+  buildUI();
 
   formContainer = document.getElementById('entryForm');
+  entriesContainer = document.getElementById('entriesList');
   titleInput = document.getElementById('entryTitle');
   contentInput = document.getElementById('entryContent');
   submitBtn = document.getElementById('submitEntryBtn');
   cancelBtn = document.getElementById('cancelEditBtn');
-  entriesContainer = document.getElementById('entriesList');
-
-  submitBtn.addEventListener('click', saveOrUpdate);
-  cancelBtn.addEventListener('click', resetForm);
-
-  entriesContainer.addEventListener('click', (e) => {
-    const editBtn = e.target.closest('.edit-entry');
-    if (editBtn) startEdit(parseInt(editBtn.dataset.id));
-    const delBtn = e.target.closest('.delete-entry');
-    if (delBtn) deleteEntry(parseInt(delBtn.dataset.id));
-  });
 
   loadEntries();
   renderEntries();
+
+  if (submitBtn) submitBtn.addEventListener('click', saveOrUpdate);
+  if (cancelBtn) cancelBtn.addEventListener('click', resetForm);
+
+  if (entriesContainer) {
+    entriesContainer.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.edit-entry');
+      const deleteBtn = e.target.closest('.delete-entry');
+      
+      if (editBtn) {
+        const id = parseInt(editBtn.getAttribute('data-id'), 10);
+        startEdit(id);
+      } else if (deleteBtn) {
+        const id = parseInt(deleteBtn.getAttribute('data-id'), 10);
+        deleteEntry(id);
+      }
+    });
+  }
+
+  return `UI successfully initialized. Message received: "${message}"`;
 }
 
-// The exported function – argument can be any string (like your console.log test)
-export function ui(message) {
-  if (message) console.log(message); // logs "App is searching for ui"
-  injectStyles();
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', buildUI);
-  } else {
-    buildUI();
-  }
-}
+module.exports = { ui };
